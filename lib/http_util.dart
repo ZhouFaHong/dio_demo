@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'global_config.dart';
-import 'result_code.dart';
 
 /*
  * 网络请求管理类
@@ -24,7 +23,7 @@ class HttpUtil {
   }
 
   // 构造函数
-  DioManager() {
+  HttpUtil() {
     // BaseOptions、Options、RequestOptions 都可以配置参数，
     // 优先级别依次递增，且可以根据优先级别覆盖参数
     options = new BaseOptions(
@@ -105,30 +104,20 @@ class HttpUtil {
         }
       }
     } on DioError catch (error) {
-      // 请求错误处理
-      Response errorResponse;
-      if (error.response != null) {
-        errorResponse = error.response;
-      } else {
-        errorResponse = new Response(statusCode: 666);
-      }
-      // 请求超时
-      if (error.type == DioErrorType.CONNECT_TIMEOUT) {
-        errorResponse.statusCode = ResultCode.CONNECT_TIMEOUT;
-      }
-      // 一般服务器错误
-      else if (error.type == DioErrorType.RECEIVE_TIMEOUT) {
-        errorResponse.statusCode = ResultCode.RECEIVE_TIMEOUT;
-      }
-
+      
       // debug模式才打印
       if (GlobalConfig.isDebug) {
         print('请求异常: ' + error.toString());
         print('请求异常url: ' + url);
         print('请求头: ' + dio.options.headers.toString());
-        print('method: ' + dio.options.method);
+        // print('method: ' + dio.options.method);
+        // 如果调用dio.options.method 会报以下错误,
+        // [ERROR:flutter/lib/ui/ui_dart_state.cc(148)] Unhandled Exception: Invalid argument(s)
       }
+      // 请求错误处理
+      formatError(error);
       _error(errorCallBack, error.message);
+      
       return '';
     }
     // debug模式打印相关数据

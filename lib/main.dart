@@ -43,22 +43,21 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     Function success = (data) {
-      print('data=$data');
+      // print('data=$data');
     };
     Function error = (error) {
-      print('error=$error');
+      print('错误error=$error');
     };
     CancelToken _cancelToken = new CancelToken();
     HttpUtil.getInstance()
         .get('/topics', {}, success, error, cancelToken: _cancelToken);
     
     // 延迟一秒执行
-    Future.delayed(Duration(seconds: 1), () {
-      print('$_cancelToken');
+    Future.delayed(Duration(seconds: 2), () {
       // 成功
-      // _cancelToken.cancel('取消请求'); 
+      _cancelToken.cancel('取消请求'); 
       // HttpUtil.getInstance().cancelRequests(_cancelToken);
-      print('延时1s执行');
+      print('延时2s执行');
     });
   }
 
