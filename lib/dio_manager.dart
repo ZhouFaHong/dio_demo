@@ -9,9 +9,13 @@ import 'result_code.dart';
  * 网络请求管理类
  */
 class DioManager {
+  
+  static DioManager _instance;
+  Dio dio;
+  BaseOptions options;
+
   // 写一个单例
   // 在 Dart 里，带下划线开头的变量是私有变量
-  static DioManager _instance;
   static DioManager getInstance() {
     if (_instance == null) {
       _instance = DioManager();
@@ -19,8 +23,7 @@ class DioManager {
     return _instance;
   }
 
-  Dio dio = new Dio();
-  BaseOptions options;
+  // 构造函数
   DioManager() {
     // BaseOptions、Options、RequestOptions 都可以配置参数，
     // 优先级别依次递增，且可以根据优先级别覆盖参数
@@ -45,13 +48,12 @@ class DioManager {
     );
     dio = new Dio(options);
 
-
-    //是否开启请求日志
+    //  是否开启请求日志
     dio.interceptors.add(LogInterceptor(responseBody: GlobalConfig.isDebug)); 
-    //缓存相关类，具体设置见https://github.com/flutterchina/cookie_jar
+    //  缓存相关类，具体设置见https://github.com/flutterchina/cookie_jar
     dio.interceptors.add(CookieManager(CookieJar())); 
 
-    //添加拦截器
+    //  添加拦截器
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (RequestOptions options) {
       print("请求之前");
@@ -70,23 +72,26 @@ class DioManager {
 
   //get请求
   get(String url, params, Function successCallBack,
-      Function errorCallBack) async {
-    _requstHttp(url, successCallBack, 'get', params, errorCallBack);
+      Function errorCallBack,{cancelToken}) async {
+    _requstHttp(url, successCallBack, 'get', params, errorCallBack,cancelToken);
   }
 
   //post请求
   post(String url, params, Function successCallBack,
-      Function errorCallBack) async {
-    _requstHttp(url, successCallBack, "post", params, errorCallBack);
+      Function errorCallBack ,{cancelToken}) async {
+    _requstHttp(url, successCallBack, "post", params, errorCallBack,cancelToken);
   }
 
+  /**
+   * cancelToken 取消请求
+   */
   _requstHttp(String url, Function successCallBack,
-      [String method, params, Function errorCallBack]) async {
+      [String method, params, Function errorCallBack,CancelToken cancelToken]) async {
     Response response;
     try {
       if (method == 'get') {
         if (params.length > 0) {
-          response = await dio.get(url, queryParameters: params);
+          response = await dio.get(url, queryParameters: params,cancelToken: cancelToken);
         } else {
           response = await dio.get(url);
         }
@@ -173,16 +178,6 @@ class DioManager {
     return response.data;
   }
 
-    /*
-   * 取消请求
-   *
-   * 同一个cancel token 可以用于多个请求，当一个cancel token取消时，所有使用该cancel token的请求都会被取消。
-   * 所以参数可选
-   */
-  void cancelRequests(CancelToken token) {
-    token.cancel("cancelled");
-  }
-
   /*
    * error统一处理
    */
@@ -206,6 +201,16 @@ class DioManager {
       //DEFAULT Default error type, Some other Error. In this case, you can read the DioError.error if it is not null.
       print("未知错误");
     }
+  }
+
+   /*
+   * 取消请求
+   *
+   * 同一个cancel token 可以用于多个请求，当一个cancel token取消时，所有使用该cancel token的请求都会被取消。
+   * 所以参数可选
+   */
+  void cancelRequests(CancelToken token) {
+    token.cancel("cancelled");
   }
 
 }

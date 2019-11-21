@@ -8,7 +8,7 @@ class HttpUtil {
   Dio dio;
   BaseOptions options;
 
-  CancelToken cancelToken = new CancelToken();
+  // CancelToken cancelToken = new CancelToken();
 
   static HttpUtil getInstance() {
     if (null == instance) instance = new HttpUtil();
