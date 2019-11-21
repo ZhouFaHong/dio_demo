@@ -8,7 +8,6 @@ import 'global_config.dart';
  * 网络请求管理类
  */
 class HttpUtil {
-  
   static HttpUtil _instance;
   Dio dio;
   BaseOptions options;
@@ -48,9 +47,9 @@ class HttpUtil {
     dio = new Dio(options);
 
     //  是否开启请求日志
-    dio.interceptors.add(LogInterceptor(responseBody: GlobalConfig.isDebug)); 
+    dio.interceptors.add(LogInterceptor(responseBody: GlobalConfig.isDebug));
     //  缓存相关类，具体设置见https://github.com/flutterchina/cookie_jar
-    dio.interceptors.add(CookieManager(CookieJar())); 
+    dio.interceptors.add(CookieManager(CookieJar()));
 
     //  添加拦截器
     dio.interceptors
@@ -70,41 +69,47 @@ class HttpUtil {
   }
 
   //get请求
-  get(String url, params, Function successCallBack,
-      Function errorCallBack,{cancelToken}) async {
-    _requstHttp(url, successCallBack, 'get', params, errorCallBack,cancelToken);
+  get(String url, params, Function successCallBack, Function errorCallBack,
+      {cancelToken}) async {
+    _requstHttp(
+        url, successCallBack, 'get', params, errorCallBack, cancelToken);
   }
 
   //post请求
-  post(String url, params, Function successCallBack,
-      Function errorCallBack ,{cancelToken}) async {
-    _requstHttp(url, successCallBack, "post", params, errorCallBack,cancelToken);
+  post(String url, params, Function successCallBack, Function errorCallBack,
+      {cancelToken}) async {
+    _requstHttp(
+        url, successCallBack, "post", params, errorCallBack, cancelToken);
   }
 
   /**
    * requstHttp请求
    */
   _requstHttp(String url, Function successCallBack,
-      [String method, params, Function errorCallBack,CancelToken cancelToken]) async {
+      [String method,
+      params,
+      Function errorCallBack,
+      CancelToken cancelToken]) async {
     Response response;
 
     // cancelToken: 取消请求
     try {
       if (method == 'get') {
         if (params.length > 0) {
-          response = await dio.get(url, queryParameters: params,cancelToken: cancelToken);
+          response = await dio.get(url,
+              queryParameters: params, cancelToken: cancelToken);
         } else {
-          response = await dio.get(url,cancelToken: cancelToken);
+          response = await dio.get(url, cancelToken: cancelToken);
         }
       } else if (method == 'post') {
         if (params.length > 0) {
-          response = await dio.post(url, data: params,cancelToken: cancelToken);
+          response =
+              await dio.post(url, data: params, cancelToken: cancelToken);
         } else {
-          response = await dio.post(url,cancelToken: cancelToken);
+          response = await dio.post(url, cancelToken: cancelToken);
         }
       }
     } on DioError catch (error) {
-      
       // debug模式才打印
       if (GlobalConfig.isDebug) {
         print('请求异常: ' + error.toString());
@@ -117,7 +122,7 @@ class HttpUtil {
       // 请求错误处理
       formatError(error);
       _error(errorCallBack, error.message);
-      
+
       return '';
     }
     // debug模式打印相关数据
@@ -151,13 +156,14 @@ class HttpUtil {
     }
   }
 
-    /*
+  /*
    * 下载文件
    */
   downloadFile(urlPath, savePath) async {
     Response response;
     try {
-      response = await dio.download(urlPath, savePath,onReceiveProgress: (int count, int total){
+      response = await dio.download(urlPath, savePath,
+          onReceiveProgress: (int count, int total) {
         //进度
         print("$count $total");
       });
@@ -194,7 +200,7 @@ class HttpUtil {
     }
   }
 
-   /*
+  /*
    * 取消请求
    *
    * 同一个cancel token 可以用于多个请求，当一个cancel token取消时，所有使用该cancel token的请求都会被取消。
@@ -203,5 +209,4 @@ class HttpUtil {
   void cancelRequests(CancelToken token) {
     token.cancel("cancelled");
   }
-
 }
