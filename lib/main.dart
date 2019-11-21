@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'dio_manager.dart';
 import 'http_util.dart';
@@ -12,7 +13,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
@@ -31,10 +31,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
   void _incrementCounter() {
     setState(() {
-      
       _counter++;
     });
     MyAlertDialog().showAlertDialog(context);
@@ -45,26 +43,34 @@ class _MyHomePageState extends State<MyHomePage> {
     // TODO: implement initState
     super.initState();
 
-    Function success = (data){
+    Function success = (data) {
       print('data=$data');
     };
-    Function error = (error){
+    Function error = (error) {
       print('error=$error');
     };
-    DioManager.getInstance().get('/topics', {}, success, error);
+    CancelToken _cancelToken = new CancelToken();
+    DioManager.getInstance()
+        .get('/topics', {}, success, error, cancelToken: _cancelToken);
+    
+    // 延迟一秒执行
+    Future.delayed(Duration(seconds: 1), () {
+      print('$_cancelToken');
+      // 成功
+      // _cancelToken.cancel('取消请求'); 
+      // DioManager.getInstance().cancelRequests(_cancelToken);
+      print('延时1s执行');
+    });
   }
+
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
-        
         title: Text(widget.title),
       ),
       body: Center(
-        
         child: Column(
-          
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(

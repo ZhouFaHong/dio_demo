@@ -83,23 +83,25 @@ class DioManager {
   }
 
   /**
-   * cancelToken 取消请求
+   * requstHttp请求
    */
   _requstHttp(String url, Function successCallBack,
       [String method, params, Function errorCallBack,CancelToken cancelToken]) async {
     Response response;
+
+    // cancelToken: 取消请求
     try {
       if (method == 'get') {
         if (params.length > 0) {
           response = await dio.get(url, queryParameters: params,cancelToken: cancelToken);
         } else {
-          response = await dio.get(url);
+          response = await dio.get(url,cancelToken: cancelToken);
         }
       } else if (method == 'post') {
         if (params.length > 0) {
-          response = await dio.post(url, data: params);
+          response = await dio.post(url, data: params,cancelToken: cancelToken);
         } else {
-          response = await dio.post(url);
+          response = await dio.post(url,cancelToken: cancelToken);
         }
       }
     } on DioError catch (error) {
