@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'dio_manager.dart';
 import 'http_util.dart';
 import 'alert_dialog.dart';
 
@@ -50,7 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print('error=$error');
     };
     CancelToken _cancelToken = new CancelToken();
-    DioManager.getInstance()
+    HttpUtil.getInstance()
         .get('/topics', {}, success, error, cancelToken: _cancelToken);
     
     // 延迟一秒执行
@@ -58,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print('$_cancelToken');
       // 成功
       // _cancelToken.cancel('取消请求'); 
-      // DioManager.getInstance().cancelRequests(_cancelToken);
+      // HttpUtil.getInstance().cancelRequests(_cancelToken);
       print('延时1s执行');
     });
   }
